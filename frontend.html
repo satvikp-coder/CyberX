@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberX - Real-Time Threat Awareness</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind's gray-50 */
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6; /* blue-500 */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .alert-banner {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+
+    <!-- Header -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <!-- NEW LOGO EMBEDDED HERE -->
+                <img src="https://iili.io/KNN6ryF.jpg" alt="CyberX Logo" class="h-10 w-10">
+                <div class="text-2xl font-bold text-gray-800">
+                    <span class="text-blue-600">Cyber</span>X
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#checker" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:text-gray-600 hover:text-blue-600">Scam Checker</a>
+                <a href="#resources" class="bg-blue-600 text-white px-4 py-2 rounded-full text-gray-600 hover:text-blue-600">Resources</a>
+                <a href="#report" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">Report a Scam</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="text-gray-800 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="#checker" class="block py-2 text-gray-600 hover:text-blue-600">Scam Checker</a>
+             <a href="#resources" class="block py-2 text-gray-600 hover:text-blue-600">Resources</a>
+             <a href="#report" class="block mt-2 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition text-center">Report a Scam</a>
+        </div>
+    </header>
+
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-6 py-12">
+
+
+        <!-- Hero Section -->
+        <section class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Your Digital Shield Against Online Scams</h1>
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">Stay informed with real-time data on cyber threats. Educate, alert, and protect yourself and your community from digital fraud.</p>
+        </section>
+
+
+        <!-- Scam Checker Section -->
+        <section id="checker" class="mb-16 card p-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4 text-center">Check for Scams</h2>
+            <p class="text-center text-gray-600 mb-6">Enter a URL or phone number (With Country Code) to check against our threat database.</p>
+            <div class="max-w-2xl mx-auto">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <input id="scam-input" type="text" placeholder="e.g., www.suspicious-site.com" class="flex-grow p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="check-scam-btn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition">Check Now</button>
+                </div>
+                <div id="checker-result" class="mt-6 text-center"></div>
+            </div>
+        </section>
+
+
+        <!-- Educational Resources -->
+        <section id="resources" class="mb-16">
+             <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Stay Safe Online</h2>
+             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                   <div class="card p-6">
+                         <h3 class="text-xl font-semibold text-blue-600 mb-3">Recognize Phishing</h3>
+                         <p class="text-gray-600">Learn to spot fake emails and websites. Look for spelling errors, urgent requests, and suspicious links before you click.</p>
+                   </div>
+                   <div class="card p-6">
+                         <h3 class="text-xl font-semibold text-blue-600 mb-3">Secure Your Accounts</h3>
+                         <p class="text-gray-600">Use strong, unique passwords for every account and enable Two-Factor Authentication (2FA) wherever possible.</p>
+                   </div>
+                   <div class="card p-6">
+                         <h3 class="text-xl font-semibold text-blue-600 mb-3">Avoid UPI Fraud</h3>
+                         <p class="text-gray-600">Never share your UPI PIN. Remember, you don't need to enter a PIN to receive money, only to send it.</p>
+                   </div>
+             </div>
+        </section>
+
+
+        <!-- Report a Scam -->
+        <section id="report" class="card p-8 bg-gray-900 text-white">
+            <h2 class="text-3xl font-bold mb-4 text-center">Spotted a Scam? Report It!</h2>
+            <p class="text-center text-gray-300 mb-6">Help protect the community by reporting suspicious activity. Your report helps our system learn and alert others faster.</p>
+            <form id="report-form" class="max-w-2xl mx-auto">
+                <div class="mb-4">
+                    <label for="report-type" class="block mb-2 font-semibold">Type of Scam</label>
+                    <select id="report-type" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option>Phishing Website</option>
+                        <option>Scam Call/SMS</option>
+                        <option>UPI Fraud</option>
+                        <option>Social Media Impersonation</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="mb-6">
+                    <label for="report-details" class="block mb-2 font-semibold">Details (URL, Phone Number, etc.)</label>
+                    <textarea id="report-details" rows="3" class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Provide as much detail as possible..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition">Submit Report</button>
+                <p id="report-success" class="text-center mt-4 text-green-400 hidden">Thank you! Your report has been submitted.</p>
+            </form>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2025 CyberX. A Tech for Good Initiative.</p>
+            <p class="text-gray-400 text-sm mt-2">This is a project for the IBM Z Datathon.</p>
+            <p class="text-gray-400 text-sm mt-2">By ~ Satvik Patel, Diyan Patel, Garv Gurwara, Krish Podar, Nancy Gupta, Mallik S </p>
+        </div>
+    </footer>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+
+
+    // --- API CONFIGURATION ---
+    // IMPORTANT: Replace <YOUR_LINUXONE_SERVER_IP> with the actual public IP address of your server.
+    const API_BASE_URL = 'http://<YOUR_LINUXONE_SERVER_IP>:3000';
+    
+    const API = {
+        checkScam: async (query) => {
+            const response = await fetch(`${API_BASE_URL}/api/check?q=${encodeURIComponent(query)}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return await response.json();
+        },
+        submitReport: async (report) => {
+            const response = await fetch(`${API_BASE_URL}/api/report`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(report),
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return await response.json();
+        }
+    };
+    // --- END OF API CONFIGURATION ---
+
+
+    
+    // --- Scam Checker Logic ---
+    const scamInput = document.getElementById('scam-input');
+    const checkScamBtn = document.getElementById('check-scam-btn');
+    const checkerResult = document.getElementById('checker-result');
+    
+    checkScamBtn.addEventListener('click', async () => {
+        const query = scamInput.value.trim();
+        if (!query) return;
+
+
+        checkScamBtn.disabled = true;
+        checkScamBtn.textContent = 'Checking...';
+        checkerResult.innerHTML = '<div class="loader" style="width: 20px; height: 20px;"></div>';
+
+
+        try {
+            const result = await API.checkScam(query);
+
+
+            let colorClass = '';
+            if(result.status === 'danger') colorClass = 'text-red-600 bg-red-100 border-red-500';
+            if(result.status === 'safe') colorClass = 'text-green-600 bg-green-100 border-green-500';
+            if(result.status === 'neutral') colorClass = 'text-gray-600 bg-gray-100 border-gray-500';
+            
+            checkerResult.innerHTML = `<div class="p-4 mt-4 rounded-lg border ${colorClass} alert-banner">${result.message}</div>`;
+        } catch (error) {
+            console.error('Failed to check scam:', error);
+            checkerResult.innerHTML = `<div class="p-4 mt-4 rounded-lg border text-red-600 bg-red-100 border-red-500 alert-banner">Error connecting to the server.</div>`;
+        } finally {
+            checkScamBtn.disabled = false;
+            checkScamBtn.textContent = 'Check Now';
+        }
+    });
+
+
+    // --- Report Form Logic ---
+    const reportForm = document.getElementById('report-form');
+    const reportSuccess = document.getElementById('report-success');
+
+
+    reportForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const report = {
+            type: document.getElementById('report-type').value,
+            details: document.getElementById('report-details').value.trim()
+        };
+
+
+        if (!report.details) {
+            alert('Please provide details for the report.');
+            return;
+        }
+
+
+        const submitBtn = reportForm.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+
+        try {
+            const result = await API.submitReport(report);
+
+
+            if (result.success) {
+                reportSuccess.classList.remove('hidden');
+                reportForm.reset();
+                setTimeout(() => reportSuccess.classList.add('hidden'), 5000);
+            }
+        } catch(error) {
+            console.error('Failed to submit report:', error);
+            alert('Could not submit the report. Please try again later.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Report';
+        }
+    });
+    
+    // --- Mobile Menu ---
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+
+});
+</script>
+
+
+</body>
+</html>
+
+
+
+
+

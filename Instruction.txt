@@ -1,0 +1,115 @@
+CyberX - Unified Full Stack Deployment Guide
+This guide provides a complete, end-to-end workflow for deploying the entire CyberX application. It covers the Node.js backend, the frontend website, and explains how they connect to form a complete project.
+
+Understanding the Architecture
+Your project has two main parts:
+
+The Backend (Your API Server):
+
+Files: server.js, package.json
+
+Purpose: This is the 'engine' of your application. It runs 24/7 on your LinuxONE server, manages data (currently mocked, but ready for a database), and responds to requests from the frontend.
+
+Deployment: You will install Node.js on your server, upload these files, and run them as a permanent background service using a tool called pm2.
+
+The Frontend (Your Website):
+
+File: index.html
+
+Purpose: This is the visual interface that users interact with. It contains all the HTML, CSS, and JavaScript that renders the dashboard in a web browser.
+
+Deployment: After its API endpoint is configured, this file can be opened directly in a browser. For a production setup, you would typically place it in a web server's public directory (like /var/www/html), but for this project, opening the file directly is sufficient.
+
+These two parts are not merged. They communicate over the network. The frontend sends HTTP requests to the backend's IP address, and the backend sends back data in JSON format.
+
+Part 1: Backend & Node.js Server Setup
+Goal: Get your server.js API running permanently on the LinuxONE server.
+
+Step 1: Install Node.js Environment
+Connect to your server via SSH and install nvm (Node Version Manager) and Node.js itself.
+
+# Connect to your server
+ssh your_username@<YOUR_LINUXONE_SERVER_IP>
+
+# Download and run the nvm installation script
+curl -o- [https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh](https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh) | bash
+
+# Reload your shell to apply changes
+source ~/.bashrc 
+
+# Install the latest Long-Term Support (LTS) version of Node.js
+nvm install --lts
+
+Step 2: Upload and Prepare Your Backend Code
+Transfer the backend files from your local computer to the server.
+
+# IMPORTANT: Run this command from your LOCAL machine's terminal,
+# in the directory containing your 'cyberx-backend' folder.
+scp -r cyberx-backend your_username@<YOUR_LINUXONE_SERVER_IP>:~
+
+Now, back in your SSH session on the server, install the required libraries.
+
+# Navigate to the project directory on your server
+cd ~/cyberx-backend
+
+# Read package.json and install 'express' and 'cors'
+npm install
+
+Step 3: Run the Backend as a Permanent Service
+Use the pm2 process manager to ensure your API stays online.
+
+# Install pm2 globally on the server
+npm install pm2 -g
+
+# Start your server.js application with the name "cyberx-api"
+pm2 start server.js --name "cyberx-api"
+
+# Verify that the application is online
+pm2 list 
+# You should see 'cyberx-api' with a green 'online' status.
+
+Step 4: Open Firewall Port
+Allow external traffic to reach your application on port 3000.
+
+# For Ubuntu (using ufw)
+sudo ufw allow 3000/tcp
+sudo ufw reload
+
+# For RHEL/CentOS (using firewalld)
+sudo firewall-cmd --zone=public --add-port=3000/tcp --permanent
+sudo firewall-cmd --reload
+
+At this point, your backend is live and accessible from the internet.
+
+Part 2: Frontend Website Configuration
+Goal: Tell your index.html file the public address of your live backend.
+
+Step 1: Find Your Server's Public IP Address
+If you don't know your server's IP, run this command in your SSH session:
+
+hostname -I | awk '{print $1}'
+
+Copy the IP address it returns.
+
+Step 2: Edit the index.html File
+Open your index.html file on your local computer using a text editor.
+
+Step 3: Set the API Endpoint
+Find this line in the <script> section at the bottom of the file:
+
+const API_BASE_URL = 'http://<YOUR_LINUXONE_SERVER_IP>:3000';
+
+Replace <YOUR_LINUXONE_SERVER_IP> with the actual IP address you copied in Step 1. For example:
+
+const API_BASE_URL = '[http://192.168.1.100:3000](http://192.168.1.100:3000)'; // Example IP
+
+Save the index.html file.
+
+Part 3: Launching the Application
+You have now completed the entire setup.
+
+Backend is running: Your API is live on the LinuxONE server.
+
+Frontend is configured: Your website now knows how to connect to the API.
+
+To use the application, simply open the index.html file you just edited in a web browser on your computer. It will load the user interface and immediately fetch live data from your server.
