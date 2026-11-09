@@ -32,4 +32,4 @@ Hackathon prototype (October 2025). Duplicate copies exist in `CyberX.github.io`
 
 ## License
 
-[TODO: ask Satvik: choose a license; team members' consent may be needed]
+MIT. See `LICENSE`.
